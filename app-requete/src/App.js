@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import proofOfWorkMiddleware from "./middlewares/pow";
+import loggerMiddleware from "./middlewares/logger";
+import timerMiddleware from "./middlewares/timer";
 
 function App() {
   const [url, setUrl] = useState("");
