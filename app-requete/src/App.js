@@ -6,6 +6,7 @@ function App() {
   const [middlewaresInput, setMiddlewaresInput] = useState("");
   // eslint-disable-next-line
   const [logs, setLogs] = useState([]);
+  const [method, setMethod] = useState("GET");
 
   const handleStart = async () => {
     const names = middlewaresInput.split(",").map((n) => n.trim()).filter(Boolean);
@@ -18,7 +19,7 @@ function App() {
     for (let i = 0; i < count; i++) {
       const req = {
         url,
-        method: "GET",
+        method,
         headers: {},
         time: Date.now(),
         path: new URL(url).pathname
@@ -55,12 +56,12 @@ function App() {
 
   async function loadMiddlewares(names) {
     const middlewares = [];
-  
+
     for (const name of names) {
       try {
         const response = await fetch(`/middlewares/${name}.js?timestamp=${Date.now()}`);
         const code = await response.text();
-  
+
         window.__middleware__ = null;
         // eslint-disable-next-line no-new-func
         new Function(code)();
@@ -73,11 +74,9 @@ function App() {
         console.error(`Erreur lors du chargement du middleware "${name}"`, err);
       }
     }
-  
+
     return middlewares;
   }
-  
-  
 
   function runMiddlewares(req, res, middlewares, onComplete) {
     let index = 0;
@@ -95,7 +94,6 @@ function App() {
     next();
   }
 
-
   return (
     <div style={{ padding: 20, fontFamily: "Arial" }}>
       <h1>Testeur de Résilience API</h1>
@@ -109,6 +107,16 @@ function App() {
           placeholder="https://exemple.com/api"
           style={{ width: "100%" }}
         />
+      </div>
+
+      <div style={{ marginBottom: 10 }}>
+        <label>Méthode HTTP :</label><br />
+        <select value={method} onChange={(e) => setMethod(e.target.value)}>
+          <option value="GET">GET</option>
+          <option value="POST">POST</option>
+          <option value="PUT">PUT</option>
+          <option value="DELETE">DELETE</option>
+        </select>
       </div>
 
       <div style={{ marginBottom: 10 }}>
