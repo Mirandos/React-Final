@@ -9,26 +9,35 @@ const TesteurResilience = ({
   setMiddlewaresInput,
   logs,
   handleStart,
+  method,
+  setMethod,
 }) => {
   return (
-    <div style={{ padding: 20, fontFamily: "Arial" }}>
+    <div className="container">
       <h1>Testeur de Résilience API</h1>
 
-      <div style={{ marginBottom: 10 }}>
+      <div>
         <label>URL de l'API à tester :</label>
-        <br />
         <input
           type="text"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           placeholder="https://exemple.com/api"
-          style={{ width: "100%" }}
         />
       </div>
 
-      <div style={{ marginBottom: 10 }}>
+      <div>
+        <label>Méthode HTTP :</label>
+        <select value={method} onChange={(e) => setMethod(e.target.value)}>
+          <option value="GET">GET</option>
+          <option value="POST">POST</option>
+          <option value="PUT">PUT</option>
+          <option value="DELETE">DELETE</option>
+        </select>
+      </div>
+
+      <div>
         <label>Nombre de requêtes :</label>
-        <br />
         <input
           type="number"
           value={count}
@@ -37,21 +46,19 @@ const TesteurResilience = ({
         />
       </div>
 
-      <div style={{ marginBottom: 10 }}>
+      <div>
         <label>Middlewares (séparés par des virgules) :</label>
-        <br />
         <input
           type="text"
           value={middlewaresInput}
           onChange={(e) => setMiddlewaresInput(e.target.value)}
           placeholder="logger, timer, pow"
-          style={{ width: "100%" }}
         />
       </div>
 
       <button onClick={handleStart}>Lancer le test</button>
 
-      <div style={{ marginTop: 20 }}>
+      <div>
         <h2>Logs :</h2>
         <pre>{logs.join("\n")}</pre>
       </div>
