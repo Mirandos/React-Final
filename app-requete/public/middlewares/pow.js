@@ -18,6 +18,7 @@ window.__middleware__ = function (req, res, next) {
         const tryNonce = async () => {
             for (let i = 0; i < 1000; i++) {
                 nonce++;
+                console.log(nonce)
                 hash = await sha256(req.url + nonce);
                 if (hash.startsWith(target)) {
                     req.headers = {

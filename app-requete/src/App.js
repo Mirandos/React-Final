@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {Routes, Route } from "react-router-dom";
 import TesteurResilience from "./interface/TesteurResilience";
 import "./App.css";
@@ -8,24 +8,47 @@ function App() {
   const [count, setCount] = useState(1);
   const [middlewaresInput, setMiddlewaresInput] = useState("");
   const [logs, setLogs] = useState([]);
+  const [results, setResults] = useState([]);
   const [method, setMethod] = useState("GET");
   const [requestBody, setRequestBody] = useState("");
+
+  const [isRunning, setIsRunning] = useState(false);
+  const abortControllerRef = useRef(null);
+
+
 
   const addLog = (message) => {
     setLogs((prev) => [...prev, message]);
     console.log(message);
   };
 
+  const addResult = (message) => {
+    setResults((prev) => [...prev, message]);
+    console.log(message);
+  };
+
   window.__addLog = addLog;
 
   const handleStart = async () => {
+    if (isRunning) {
+      abortControllerRef.current?.abort();
+      setIsRunning(false);
+      addResult("Test interrompu");
+      return;
+    }
+
     const names = middlewaresInput.split(",").map((n) => n.trim()).filter(Boolean);
     const middlewares = await loadMiddlewares(names);
     setLogs([]);
+    setResults([]);
 
     let success = 0;
     let failure = 0;
     let totalTime = 0;
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    setIsRunning(true);
 
     const requests = Array.from({ length: count }, (_, i) => {
       return new Promise(async (resolve) => {
@@ -50,6 +73,7 @@ function App() {
             headers: {
               ...req.headers,
             },
+            signal: controller.signal,
           };
           
           if (method !== "GET" && requestBody.trim()) {
@@ -57,7 +81,7 @@ function App() {
               options.headers["Content-Type"] = "application/json";
               options.body = JSON.stringify(JSON.parse(requestBody));
             } catch (err) {
-              addLog(`Body invalide : ${err.message}`);
+              addResult(`Body invalide : ${err.message}`);
               resolve();
               return;
             }
@@ -84,10 +108,13 @@ function App() {
     await Promise.all(requests);
 
     const average = count > 0 ? totalTime / count : 0;
-    addLog("Résultats finaux :");
-    addLog(`Succès : ${success}`);
-    addLog(`Échecs : ${failure}`);
-    addLog(`Temps moyen : ${Math.round(average)} ms`);
+    addResult("Résultats finaux :");
+    addResult(`Succès : ${success}`);
+    addResult(`Échecs : ${failure}`);
+    addResult(`Temps moyen : ${Math.round(average)} ms`);
+
+    setIsRunning(false);
+    abortControllerRef.current = null;
   };
 
   async function loadMiddlewares(names) {
@@ -139,6 +166,7 @@ function App() {
           path="/"
           element={
             <TesteurResilience
+              isRunning={isRunning}
               url={url}
               setUrl={setUrl}
               count={count}
@@ -146,6 +174,7 @@ function App() {
               middlewaresInput={middlewaresInput}
               setMiddlewaresInput={setMiddlewaresInput}
               logs={logs}
+              results={results}
               handleStart={handleStart}
               method={method}
               setMethod={setMethod}

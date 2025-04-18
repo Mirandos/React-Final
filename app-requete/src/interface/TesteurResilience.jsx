@@ -8,11 +8,13 @@ const TesteurResilience = ({
   middlewaresInput,
   setMiddlewaresInput,
   logs,
+  results,
   handleStart,
   method,
   setMethod,
   requestBody,
-  setRequestBody
+  setRequestBody,
+  isRunning,
 }) => {
   return (
     <div className="container">
@@ -78,7 +80,27 @@ const TesteurResilience = ({
         />
       </div>
 
-      <button onClick={handleStart}>Lancer le test</button>
+      <button
+        onClick={handleStart}
+        style={{
+          backgroundColor: isRunning ? "#e63946" : "#1d4ed8",
+          color: "white",
+          padding: "12px 24px",
+          border: "none",
+          borderRadius: "8px",
+          fontSize: "16px",
+          cursor: "pointer",
+          width: "100%",
+          marginTop: "20px",
+        }}
+      >
+        {isRunning ? "Arrêter le test" : "Lancer le test"}
+      </button>
+
+      <div>
+        <h2>Résultats :</h2>
+        <pre>{results.join("\n")}</pre>
+      </div>
 
       <div>
         <h2>Logs :</h2>
