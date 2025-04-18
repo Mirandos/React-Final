@@ -11,6 +11,8 @@ const TesteurResilience = ({
   handleStart,
   method,
   setMethod,
+  requestBody,
+  setRequestBody
 }) => {
   return (
     <div className="container">
@@ -35,6 +37,26 @@ const TesteurResilience = ({
           <option value="DELETE">DELETE</option>
         </select>
       </div>
+
+      {method !== "GET" && (
+        <div>
+          <label>Body (JSON) :</label>
+          <textarea
+            value={requestBody}
+            onChange={(e) => setRequestBody(e.target.value)}
+            placeholder='{"clé": "valeur"}'
+            rows={5}
+            style={{
+              width: "100%",
+              padding: "10px",
+              borderRadius: "6px",
+              fontFamily: "monospace",
+              resize: "vertical",
+              marginBottom: "10px",
+            }}
+          />
+        </div>
+      )}
 
       <div>
         <label>Nombre de requêtes :</label>
