@@ -15,9 +15,7 @@ window.__middleware__ = function (req, res, next) {
     };
 
     const findNonce = () => {
-        console.log('TEST')
         const tryNonce = async () => {
-            console.log('TEST100')
             for (let i = 0; i < 1000; i++) {
                 nonce++;
                 hash = await sha256(req.url + nonce);

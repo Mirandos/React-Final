@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {Routes, Route } from "react-router-dom";
 import TesteurResilience from "./interface/TesteurResilience";
 import "./App.css";
 
@@ -9,6 +9,7 @@ function App() {
   const [middlewaresInput, setMiddlewaresInput] = useState("");
   const [logs, setLogs] = useState([]);
   const [method, setMethod] = useState("GET");
+  const [requestBody, setRequestBody] = useState("");
 
   const addLog = (message) => {
     setLogs((prev) => [...prev, message]);
@@ -44,7 +45,26 @@ function App() {
 
         const start = performance.now();
         try {
-          const response = await fetch(url, { method: req.method, headers: req.headers });
+          const options = {
+            method: req.method,
+            headers: {
+              ...req.headers,
+            },
+          };
+          
+          if (method !== "GET" && requestBody.trim()) {
+            try {
+              options.headers["Content-Type"] = "application/json";
+              options.body = JSON.stringify(JSON.parse(requestBody));
+            } catch (err) {
+              addLog(`Body invalide : ${err.message}`);
+              resolve();
+              return;
+            }
+          }
+          
+          const response = await fetch(url, options);
+
           const duration = performance.now() - start;
           totalTime += duration;
 
@@ -129,6 +149,8 @@ function App() {
               handleStart={handleStart}
               method={method}
               setMethod={setMethod}
+              requestBody={requestBody}
+              setRequestBody={setRequestBody}
             />
           }
         />
